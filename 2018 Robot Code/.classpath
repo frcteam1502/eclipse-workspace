@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="src" path="src"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/cscore.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/CTRE_Phoenix.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/CTRLib.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/ntcore.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/opencv.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/WPILib.jar"/>
+	<classpathentry exported="true" kind="lib" path="build/jars/wpiutil.jar"/>
+	<classpathentry exported="true" kind="lib" path="dist/FRCUserProgram.jar"/>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JRE-1.1"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
