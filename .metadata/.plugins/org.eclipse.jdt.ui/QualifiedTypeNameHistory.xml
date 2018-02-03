@@ -1,2 +1,10 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<qualifiedTypeNameHistroy/>
+<qualifiedTypeNameHistroy>
+<fullyQualifiedTypeName name="edu.wpi.first.wpilibj.Joystick"/>
+<fullyQualifiedTypeName name="edu.wpi.first.wpilibj.GenericHID.RumbleType"/>
+<fullyQualifiedTypeName name="java.math.BigInteger"/>
+<fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.ControlMode"/>
+<fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.Type"/>
+<fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.NeutralMode"/>
+<fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.TimerType"/>
+</qualifiedTypeNameHistroy>

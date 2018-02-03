@@ -1,0 +1,8 @@
+12:40:19 **** Rebuild of configuration Debug for project Arcade Drive ****
+Info: Internal Builder is used for build
+arm-frc-linux-gnueabi-g++ -std=c++1y "-IC:\\Users\\Team 1502/wpilib/cpp/current/include" "-IC:\\Users\\Team 1502\\workspace\\Arcade Drive\\src" "-IC:\\Users\\Team 1502/wpilib/user/cpp/include" -O0 -Og -g3 -Wall -c -fmessage-length=0 -pthread -o "src\\Robot.o" "..\\src\\Robot.cpp" 
+Cannot run program "arm-frc-linux-gnueabi-g++" (in directory "C:\Users\Team 1502\workspace\Arcade Drive\Debug"): CreateProcess error=2, The system cannot find the file specified
+
+Error: Program "arm-frc-linux-gnueabi-g++" not found in PATH
+PATH=[\usr\local\bin;C:/Program Files/Java/New/bin/server;C:/Program Files/Java/New/bin;C:/Program Files/Java/New/lib/amd64;C:\ProgramData\Oracle\Java\javapath;C:\Windows\system32;C:\Windows;C:\Windows\System32\Wbem;C:\Windows\System32\WindowsPowerShell\v1.0\;C:\Program Files\git\cmd;C:\Program Files\git\mingw64\bin;C:\Program Files\git\usr\bin;C:\Users\Team 1502\AppData\Local\Microsoft\WindowsApps;;C:\Program Files\eclipse]
+

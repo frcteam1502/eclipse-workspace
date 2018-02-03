@@ -59,9 +59,7 @@ public class Robot extends IterativeRobot {
     }
     
     public void teleopInit(){
-    	
-//    	spiGyro.reset();
-    	
+    	drive.teleopInit();
     }
     
     public void teleopPeriodic() {

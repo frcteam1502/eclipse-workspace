@@ -2,6 +2,7 @@ package org.usfirst.frc.team1502.robot;
 
 import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.ADXRS450_Gyro;
 import edu.wpi.first.wpilibj.AnalogInput;
 import edu.wpi.first.wpilibj.Compressor;
@@ -14,6 +15,8 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import com.ctre.phoenix.motorcontrol.ControlMode;
 import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+import org.usfirst.frc.team1502.robot.AutoBot.Unit;
 
 public class TestRun {
     public TalonSRX rightWheel;
@@ -30,13 +33,18 @@ public class TestRun {
     public ADXRS450_Gyro spiGyro;
     
     public PIDController gyroPID;
+    public boolean isKeplerStopped = false;
     
     static final double DEADZONE = 0.02;
-    static final double OVERALL_PID_GAIN = 0.04;
+    public static final double OVERALL_PID_GAIN = 0.04;
+    public static final double WHEEL_TICKS_PER_DEGREE = 2588 / 360;
+    
     static double EXP_RATE = 3;
     
     boolean gyroWasOnLastCycle = false;
     boolean gyroIsOn = false;
+    
+    public Rumbler r;
     
     public TestRun(Joystick left, Joystick right, Joystick manip, int w1, int w2, int w3, ADXRS450_Gyro spiGyro) {
         this.leftStick = left;
@@ -57,40 +65,43 @@ public class TestRun {
     
     // Makes sure there's no unintended joystick drift
     public void autonomousPeriodic() {
-    	tickCount++;
-    	System.out.println(tickCount);
-    	if (tickCount < 50) {
-    		
-    	} else if (tickCount < 50 + 250) {
-    		//MecanumDrive.drive(this, -0.35, 0, 0);
-    	} else {
-    		//MecanumDrive.drive(this, 0, 0, 0);
-    	}
+    	
     }
     
     public void autonomousInit() {
-    	String gameData;
-    	gameData = DriverStation.getInstance().getGameSpecificMessage();
-    	
-    	if (gameData.valueOf(0) == "L") {
-    		//Left
-    	} else {
-    		//Right
-    	}
-    }
-    
-    public void teleopPeriodic() {
+//    	String gameData;
+//    	gameData = DriverStation.getInstance().getGameSpecificMessage();
+//    	
+//    	if (gameData.valueOf(0) == "L") {
+//    		//Left
+//    	} else {
+//    		//Right
+//    	}
     	leftWheel.configOpenloopRamp(.14, 10);
     	rightWheel.configOpenloopRamp(.14, 10);
     	
-        double speed = -MecanumDrive.expRate(deadZone(rightStick.getY()), EXP_RATE);
+    	AutoBot bot = new AutoBot(this);
+    	bot.go(-15, Unit.kFeet);
+    }
+    
+    public void teleopInit() {
+    	leftWheel.configOpenloopRamp(.14, 10);
+    	rightWheel.configOpenloopRamp(.14, 10);
+    	r = new Rumbler(manipStick);
+    	r.rumbleBothFor(1, 300);
+    }
+    
+    public void teleopPeriodic() {
+        double speed = MecanumDrive.expRate(deadZone(rightStick.getY()), EXP_RATE);
         double turn = MecanumDrive.expRate(deadZone(leftStick.getX()), EXP_RATE);
         
-        boolean isKeplerStopped = leftStick.getThrottle() < 0.95 || rightStick.getThrottle() < 0.95;
+        if (leftStick.getRawButton(11)) {
+        	isKeplerStopped = true;
+        }
         if (isKeplerStopped) {
         	leftWheel.set(ControlMode.PercentOutput, 0);
         	rightWheel.set(ControlMode.PercentOutput, 0);
-        	omniWheels.set(ControlMode.PercentOutput, 0);        	
+        	omniWheels.set(ControlMode.PercentOutput, 0);
         	leftIntake.set(0);
         	rightIntake.set(0);
         	return;
@@ -116,20 +127,15 @@ public class TestRun {
 	        }
         	
         	gyroPID.input(spiGyro.getAngle());
-            turn = -gyroPID.getCorrection() * OVERALL_PID_GAIN;           
-            //System.out.println(turn);
+            turn = -gyroPID.getCorrection() * OVERALL_PID_GAIN;
+            
+            System.out.println("stability: " + (Math.abs(turn) < 0.05));
+            System.out.println("isStable:" + gyroPID.isStable(2));
         }
         
         leftWheel.set(ControlMode.PercentOutput, speed);
         rightWheel.set(ControlMode.PercentOutput, -speed);
         omniWheels.set(ControlMode.PercentOutput, -turn);
-        
-        if (manipStick.getRawButton(5)) {
-        	manipStick.setRumble(RumbleType.kLeftRumble, 1);
-        }
-        if (manipStick.getRawButton(6)) {
-        	manipStick.setRumble(RumbleType.kRightRumble, 1);
-        }
         
         if (manipStick.getRawButton(4)) { // out
         	leftIntake.set(1);
@@ -147,6 +153,7 @@ public class TestRun {
         	leftIntake.set(0);
         	rightIntake.set(0);
         }
+        SmartDashboard.putNumber("PID Value", turn);
     }
     
     public double deadZone(double i) {

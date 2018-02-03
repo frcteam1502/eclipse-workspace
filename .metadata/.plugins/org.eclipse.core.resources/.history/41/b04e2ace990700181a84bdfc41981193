@@ -1,0 +1,37 @@
+package org.usfirst.frc.team1502.robot;
+
+public class Timer {
+	/*
+	 * start new thread
+	 * set timeout
+	 * set interval
+	 * clear timeout
+	 * clear interval
+	 */
+	
+	Runnable r;
+	enum TimerType {
+		kTimeout,
+		kInterval
+	}
+	
+	public Timer(Runnable r, long interval, TimerType timerType) {
+		this.r = r;
+		if (timerType == TimerType.kTimeout) {
+			Runnable timer = () -> {
+				try {
+					Thread.sleep(interval);
+				} catch (InterruptedException e) {
+					
+				} finally {
+					r.run();
+				}
+			};
+			startNewThread(timer);
+		}
+	}
+	
+	public static void startNewThread(Runnable r) {
+		
+	}
+}

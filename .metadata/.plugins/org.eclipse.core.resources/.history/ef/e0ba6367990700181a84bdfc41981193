@@ -1,0 +1,21 @@
+package org.usfirst.frc.team1502.robot;
+
+public class Timer {
+	/*
+	 * start new thread
+	 * set timeout
+	 * set interval
+	 * clear timeout
+	 * clear interval
+	 */
+	
+	enum Type {
+		kTimeout,
+		kInterval
+	}
+	
+	public static void startNewThread(Runnable r) {
+		
+	}
+
+}

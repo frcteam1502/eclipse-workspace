@@ -39,13 +39,13 @@ public class PIDController {
 		if (points.size() < 2) {
 			return 0;
 		}
-		double area = 0;
+		double absement = 0;
 		for (int tau = 1; tau < points.size(); tau++) {
-			double rectWidth = points.get(tau).millis - points.get(tau - 1).millis;
-			double rectHeight = (points.get(tau - 1).err + points.get(tau).err) / 2;
-			area += rectHeight * rectWidth;
+			double dx = points.get(tau).millis - points.get(tau - 1).millis;
+			double err = (points.get(tau - 1).err + points.get(tau).err) / 2;
+			absement += err * dx;
 		}
-		return I * area;
+		return I * absement;
 	}
 	
 	public double getD() {

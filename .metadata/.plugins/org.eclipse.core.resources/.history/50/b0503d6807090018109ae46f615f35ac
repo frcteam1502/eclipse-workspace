@@ -1,0 +1,25 @@
+package org.usfirst.frc.team1502.robot;
+
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+
+public class Rumbler {
+	Joystick joystick;
+	
+	public Rumbler(Joystick joystick) {
+		this.joystick = joystick;
+	}
+	
+	public void setLeft(double power) {
+		joystick.setRumble(RumbleType.kLeftRumble, power);
+	}
+	
+	public void setRight(double power) {
+		joystick.setRumble(RumbleType.kRightRumble, power);
+	}
+	
+	public void rumbleLeftFor(double power, double millis) {
+		setLeft(power);
+		Timer t = new Timer(() -> setLeft(0), (long) millis, Timer.TimerType.kTimeout);
+	}
+}

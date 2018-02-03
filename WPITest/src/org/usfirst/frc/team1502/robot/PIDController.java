@@ -7,7 +7,6 @@ public class PIDController {
 	double I;
 	double D;
 	ArrayList<Point> points = new ArrayList<Point>();
-	double zeroMillis;
 	
 	public PIDController(final double p, final double i, final double d) {
 		P = p;
@@ -17,7 +16,6 @@ public class PIDController {
 	
 	public void reset() {
 		points.clear();
-		zeroMillis = System.currentTimeMillis();
 	}
 	
 	public void input(double err) {
@@ -49,9 +47,16 @@ public class PIDController {
 	}
 	
 	public double getD() {
+		if (points.size() < 2) {
+			return 0;
+		}
 		double derr = latest().err - prev().err;
 		double dt = latest().millis - prev().millis;
 		return D * derr / dt;
+	}
+	
+	public boolean isStable(double threshold) {
+		return Math.abs(latest().err) < threshold && Math.abs(getD()) < threshold;
 	}
 	
 	public Point prev() {

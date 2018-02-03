@@ -1,0 +1,75 @@
+package org.usfirst.frc.team1502.robot;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+interface Lambda {
+	int call();
+}
+
+public class AutoBot {
+	TestRun driveSys;
+	
+	public enum Unit {
+		kFeet,
+		kDegrees,
+		kTicks
+	};
+	
+	public static final double TICKS_PER_FOOT = -99;
+	public static final double TICKS_PER_DEGREE = 2588 / 360;
+	
+	public AutoBot(TestRun driveSys) {
+		this.driveSys = driveSys;
+	}
+	
+	public static double convertToTicks(double value, Unit unit) {
+		switch (unit) {
+			case kFeet:
+				return value * TICKS_PER_FOOT;
+			case kDegrees:
+				return value * TICKS_PER_DEGREE;
+			case kTicks:
+				return value;
+			default:
+				throw new ArithmeticException("Can't convert units");
+		}
+	}
+	
+	public void go(double distance, Unit unit) throws InterruptedException {
+		double ticks = 0;
+		
+		PIDController gyroLock;
+		distance = convertToTicks(distance, unit);
+		double speed;
+		
+		if (distance > 0) {
+			speed = 0.4;
+			gyroLock = new PIDController(1.325, 9.49e-4, 200);
+		} else if (distance < 0) {
+			speed = -0.4;
+			gyroLock = new PIDController(0.575, 2.83e-4, 167.5);
+		} else {
+			return;
+		}
+		
+		driveSys.leftWheel.set(ControlMode.PercentOutput, speed);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, -speed);
+		Lambda getPos = () -> driveSys.leftWheel.getSensorCollection().getQuadraturePosition();
+		double initialPosition = getPos.call();
+		while (Math.abs(initialPosition - getPos.call()) < Math.abs(distance) || !gyroLock.isStable(0)) {
+			gyroLock.input(driveSys.spiGyro.getAngle());
+			System.out.println("abs dist: " + Math.abs(initialPosition - getPos.call()));
+			driveSys.omniWheels.set(ControlMode.PercentOutput, gyroLock.getCorrection());
+			if (Math.abs(initialPosition - getPos.call()) >= Math.abs(distance)) {
+				driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
+				driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+			}
+			
+			Thread.yield();
+		}
+		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
+	}
+}
