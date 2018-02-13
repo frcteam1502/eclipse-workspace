@@ -104,9 +104,9 @@ public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
 		l /= mag;
 		r /= mag;
 		
-		driveSys.leftWheel.set(ControlMode.PercentOutput, l);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, r);
-		driveSys.omniWheels.set(ControlMode.PercentOutput, o);
+//		driveSys.leftWheel.set(ControlMode.PercentOutput, l);
+//		driveSys.rightWheel.set(ControlMode.PercentOutput, r);
+//		driveSys.omniWheels.set(ControlMode.PercentOutput, o);
 	}
 	public static double getGyroTurn(TestRun driveSys, double speed) {
 		//P_TERM = driveSys.rightStick.getThrottle() * 0.05;

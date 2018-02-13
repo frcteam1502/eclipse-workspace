@@ -56,7 +56,7 @@ public class PIDController {
 	}
 	
 	public boolean isStable(double threshold) {
-		return Math.abs(latest().err) < threshold && Math.abs(getD()) < threshold;
+		return Math.abs(latest().err) < threshold && Math.abs(getD()) / D * 8000/*ms*/ < threshold;
 	}
 	
 	public Point prev() {
