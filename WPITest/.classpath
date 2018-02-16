@@ -11,5 +11,6 @@
 	<classpathentry kind="lib" path="C:/Users/Team 1502/wpilib/java/current/lib/CTRLib.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix-sources.jar"/>
 	<classpathentry kind="var" path="USERLIBS_DIR/CTRE_Phoenix.jar"/>
+	<classpathentry kind="var" path="navx-map"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

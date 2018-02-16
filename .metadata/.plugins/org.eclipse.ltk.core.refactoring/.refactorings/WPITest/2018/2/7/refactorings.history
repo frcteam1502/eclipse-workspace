@@ -1,0 +1,4 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<session version="1.0">
+<refactoring comment="Copy package &apos;org.usfirst.frc.team1502.robot&apos; to &apos;OldGyroCode/src&apos;&#x0D;&#x0A;- Original project: &apos;WPITest&apos;&#x0D;&#x0A;- Destination element: &apos;OldGyroCode/src&apos;&#x0D;&#x0A;- Original element: &apos;WPITest/src/org.usfirst.frc.team1502.robot&apos;" description="Copy package" destination="=OldGyroCode/src" element1="/src&lt;org.usfirst.frc.team1502.robot" flags="589830" fragments="1" id="org.eclipse.jdt.ui.copy" policy="org.eclipse.jdt.ui.copyPackages" stamp="1518813845615" version="1.0"/>
+</session>

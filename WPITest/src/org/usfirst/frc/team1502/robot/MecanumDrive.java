@@ -111,9 +111,10 @@ public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
 	public static double getGyroTurn(TestRun driveSys, double speed) {
 		//P_TERM = driveSys.rightStick.getThrottle() * 0.05;
 		// ^^ uncomment the above to tune P_TERM with right throttle
-		double diff = driveSys.spiGyro.getAngle() * (0.5 + speed * 0.5);
-		return -diff * P_TERM_VDRIVE;
+//		double diff = driveSys.spiGyro.getAngle() * (0.5 + speed * 0.5);
+//		return -diff * P_TERM_VDRIVE;
 		// 4deg off course:
 		// 0.02 extra turn power
+		return .2;
 	}
 }

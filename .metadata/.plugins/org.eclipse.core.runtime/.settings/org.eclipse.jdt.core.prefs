@@ -9,6 +9,7 @@ org.eclipse.jdt.core.classpathVariable.M2_REPO=C\:/Users/Team 1502/.m2/repositor
 org.eclipse.jdt.core.classpathVariable.USERLIBS_DIR=C\:/Users/Team 1502/wpilib/user/java/lib
 org.eclipse.jdt.core.classpathVariable.cscore=C\:/Users/Team 1502/wpilib/java/current/lib/cscore.jar
 org.eclipse.jdt.core.classpathVariable.cscore.sources=C\:/Users/Team 1502/wpilib/java/current/lib/cscore-sources.jar
+org.eclipse.jdt.core.classpathVariable.navx-map=C\:/Users/Team 1502/wpilib/user/java/lib/navx_frc.jar
 org.eclipse.jdt.core.classpathVariable.networktables=C\:/Users/Team 1502/wpilib/java/current/lib/ntcore.jar
 org.eclipse.jdt.core.classpathVariable.networktables.sources=C\:/Users/Team 1502/wpilib/java/current/lib/ntcore-sources.jar
 org.eclipse.jdt.core.classpathVariable.opencv=C\:/Users/Team 1502/wpilib/java/current/lib/opencv.jar
