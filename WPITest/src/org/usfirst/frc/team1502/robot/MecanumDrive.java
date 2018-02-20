@@ -117,4 +117,8 @@ public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
 		// 0.02 extra turn power
 		return .2;
 	}
+	
+	public static double map(double n, double inMin, double inMax, double outMin, double outMax) {
+		return (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+	}
 }

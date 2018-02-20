@@ -16,6 +16,7 @@ import edu.wpi.first.wpilibj.DigitalInput;
 import com.kauailabs.navx.frc.AHRS;
 import edu.wpi.first.wpilibj.SerialPort;
 import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
 
 import org.usfirst.frc.team1502.robot.AutoBot.Unit;
 
@@ -27,24 +28,27 @@ import com.ctre.phoenix.motorcontrol.can.VictorSPX;
 //import org.usfirst.frc.team1502.robot.AutoBot.Unit;
 
 public class TestRun {
-    /*public TalonSRX rightWheel1;
+    public TalonSRX rightWheel1;
     public TalonSRX rightWheel2;
     public TalonSRX leftWheel1;
-    public TalonSRX leftWheel2;*/
-	public TalonSRX leftWheel;
-	public TalonSRX rightWheel;
-	
-    public VictorSPX omniWheels;
+    public TalonSRX leftWheel2;
+	//public TalonSRX leftWheel;
+	//public TalonSRX rightWheel;
+    public TalonSRX omniWheels;
     public TalonSRX arm;
+    public TalonSRX leadScrew;
+    public TalonSRX wrist;
+    public DoubleSolenoid hand;
     public Joystick leftStick;
     public Joystick rightStick;
     public Joystick manipStick;
     public DigitalInput limitSwitch;
     public boolean gyroOnLastCycle = false;
     public int tickCount = 0; // 50 ticks per second
-    //public ADXRS450_Gyro spiGyro;
+    public ADXRS450_Gyro spiGyro;
     public Accelerometer accel;
-    public AnalogInput stringPot; //String Potentiometer
+    public AnalogInput stringPot; // arm length
+    public AnalogInput wristExtension;
     public AHRS nav;
     
     public PIDController gyroPID;
@@ -81,24 +85,32 @@ public class TestRun {
         this.rightStick = right;
         this.manipStick = manip;
         
-        /*this.rightWheel1 = new TalonSRX(1);
+        this.rightWheel1 = new TalonSRX(1);
         this.rightWheel2 = new TalonSRX(2);
         this.leftWheel1 = new TalonSRX(3);
-        this.leftWheel2 = new TalonSRX(4);*/
-        this.leftWheel = new TalonSRX(1);
-        this.rightWheel = new TalonSRX(3);
-        this.omniWheels = new VictorSPX(2);
+        this.leftWheel2 = new TalonSRX(4);
+//        this.leftWheel = new TalonSRX(1);
+//        this.rightWheel = new TalonSRX(3);
+        this.omniWheels = new TalonSRX(5);
         this.arm = new TalonSRX(6);
+        this.leadScrew = new TalonSRX(7);
+        this.wrist = new TalonSRX(8);
+        
+        this.hand = new DoubleSolenoid(11, 0, 1);
         
         this.gyroPID = new PIDController(1.325, 9.49e-4, 320);
-      //  this.spiGyro = spiGyro;
+        this.spiGyro = spiGyro;
         
-        this.stringPot = new AnalogInput(0);
+        this.stringPot = new AnalogInput(3);
+        this.wristExtension = new AnalogInput(2);
         
-        nav = new AHRS(I2C.Port.kMXP); 
+        nav = new AHRS(SPI.Port.kMXP);
     }
     
-    // Makes sure there's no unintended joystick drift
+    public void testPeriodic() {
+    	
+    }
+    
     public void autonomousPeriodic() {
     	
     }
@@ -112,16 +124,14 @@ public class TestRun {
     	} else {
     		//Right
     	}*/
-    	isTeleop = false;
-    	leftWheel.configOpenloopRamp(.15, 10);
-    	//leftWheel.configOpenloopRamp(.14, 10);
-    	rightWheel.configOpenloopRamp(.15, 10);
-    	//rightWheel2.configOpenloopRamp(.14, 10);
-    	omniWheels.configOpenloopRamp(.15, 10);
-    	arm.configOpenloopRamp(.14, 10);
-    	AutoBot bot = new AutoBot(this);
-    	Timer.startNewThread(() -> {
-    		bot.go(1, Unit.kFeet);
+//    	isTeleop = false;
+//    	leftWheel.configOpenloopRamp(.15, 10);
+//    	rightWheel.configOpenloopRamp(.15, 10);
+//    	omniWheels.configOpenloopRamp(.15, 10);
+//    	arm.configOpenloopRamp(.14, 10);
+//    	AutoBot bot = new AutoBot(this);
+//    	Timer.startNewThread(() -> {
+//    		bot.go(10, Unit.kFeet, false);	
 //    		leftWheel.set(ControlMode.PercentOutput, -.4);
 //    		rightWheel.set(ControlMode.PercentOutput, .4);
 //    		try {
@@ -134,20 +144,22 @@ public class TestRun {
 //    		} catch (InterruptedException e) {
 //    		
 //    		}
-    	});
+    //	});
     }
     
     public void teleopInit() {
     	isTeleop = true;
-    	leftWheel.configOpenloopRamp(.15, 10);
-    	rightWheel.configOpenloopRamp(.15, 10);
-    	omniWheels.configOpenloopRamp(.1, 10);
+    	leftWheel1.configOpenloopRamp(.15, 10);
+    	leftWheel2.configOpenloopRamp(.15, 10);
+    	rightWheel1.configOpenloopRamp(.15, 10);
+    	rightWheel2.configOpenloopRamp(.15, 10);
+    	//omniWheels.configOpenloopRamp(.1, 10);
     	r = new Rumbler(manipStick);
     	r.rumbleBothFor(1, 300);
     	
-    	//spiGyro.reset();
+    	nav.reset();
 
-		leftWheel.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms, 100);
+		//leftWheel.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms, 100);
     }
     
     public void teleopPeriodic() {
@@ -157,29 +169,6 @@ public class TestRun {
         if (leftStick.getRawButton(8)) {
         	//spiGyro.calibrate();
         }
-        
-        SmartDashboard.putNumber("X", nav.getRawGyroX());
-        SmartDashboard.putNumber("Y", nav.getRawGyroY());
-        SmartDashboard.putNumber("Z", nav.getRawGyroZ());
-        SmartDashboard.putNumber("XDis", nav.getDisplacementX());
-        SmartDashboard.putNumber("YDis", nav.getDisplacementY());
-        SmartDashboard.putNumber("ZDis", nav.getDisplacementZ());
-        SmartDashboard.putNumber("Yaw", nav.getYaw());
-        SmartDashboard.putNumber("WorldAccelX", nav.getWorldLinearAccelX());
-        SmartDashboard.putNumber("WorldAccelY", nav.getWorldLinearAccelY());
-        SmartDashboard.putNumber("WorldAccelZ", nav.getWorldLinearAccelZ());
-        SmartDashboard.putNumber("Barometer", nav.getBarometricPressure());
-        SmartDashboard.putNumber("QuaternionW", nav.getQuaternionW());
-        SmartDashboard.putNumber("QuaternionX", nav.getQuaternionX());
-        SmartDashboard.putNumber("QuaternionY", nav.getQuaternionY());
-        SmartDashboard.putNumber("QuaternionZ", nav.getQuaternionZ());
-        SmartDashboard.putNumber("MagX", nav.getRawMagX());
-        SmartDashboard.putNumber("MagY", nav.getRawMagY());
-        SmartDashboard.putNumber("MagZ", nav.getRawMagZ());
-        SmartDashboard.putNumber("Compass heading", nav.getCompassHeading());
-        SmartDashboard.putNumber("Angle", nav.getAngle());
-        
-        SmartDashboard.putNumber("Rand", Math.random());
        
 //        if (leftStick.getRawButton(11)) {
 //        	double pwr = rightStick.getThrottle();
@@ -199,7 +188,7 @@ public class TestRun {
 //           	return;
 //        }
         
-        //System.out.println("Gyro angle: " + spiGyro.getAngle());
+//        System.out.println("Gyro angle: " + spiGyro.getAngle());
 //        if (leftStick.getRawButton(11)) {
 //        	double r = ((1 - leftStick.getThrottle()) / 2) * 8;
 //        	System.out.println("r: " + r);
@@ -209,76 +198,141 @@ public class TestRun {
 //        	return;
 //        }
         	
-//        gyroWasOnLastCycle = gyroIsOn;
-//        gyroIsOn = rightStick.getRawButton(1);
-//        
-//        if (gyroIsOn && !gyroWasOnLastCycle) {
-//        	gyroPID.reset();
-//        //	spiGyro.reset();
-//        }
-//        
-//        if (gyroIsOn) {
-//        	if (speed <= 0) { //Forwards or Stationary
-//	        	gyroPID.P = 0.575;
-//	        	gyroPID.I = 2.83e-4;
-//	        	gyroPID.D = 167.5;
-//	        } else { //Backwards
-//	        	gyroPID.P = 1.325;
-//	        	gyroPID.I = 9.49e-4;
-//	        	gyroPID.D = 320;
-//	        }
-//        	
-//        	gyroPID.input(spiGyro.getAngle());
-//            turn = -gyroPID.getCorrection() * OVERALL_PID_GAIN;
-//            
-//            System.out.println("stability: " + (Math.abs(turn) < 0.05));
-//            System.out.println("isStable:" + gyroPID.isStable(2));
-//        }
+        gyroWasOnLastCycle = gyroIsOn;
+        gyroIsOn = rightStick.getRawButton(1);
         
-        //leftWheel.set(ControlMode.PercentOutput, speed);
-        //rightWheel.set(ControlMode.PercentOutput, -speed);
-        //omniWheels.set(ControlMode.PercentOutput, -turn);
+        if (gyroIsOn && !gyroWasOnLastCycle) {
+        	gyroPID.reset();
+        	nav.reset();
+        }
         
-        /*leftWheel1.set(ControlMode.PercentOutput, -rightStick.getY());
-        leftWheel2.set(ControlMode.PercentOutput, -rightStick.getY());
-        rightWheel1.set(ControlMode.PercentOutput, rightStick.getY());
-        rightWheel2.set(ControlMode.PercentOutput, rightStick.getY());*/
-        leftWheel.set(ControlMode.PercentOutput, speed);
-        rightWheel.set(ControlMode.PercentOutput, -speed);
-        omniWheels.set(ControlMode.PercentOutput, -turn);
-        
-        //System.out.println(rightWheel.getSensorCollection().getQuadratureVelocity());
+        if (gyroIsOn) {
+        	if (speed <= 0) { //Forwards or Stationary
+	        	gyroPID.P = 0.575 * 1.1;
+	        	gyroPID.I = 2.83e-4 * 1.1;
+	        	gyroPID.D = 167.5 * .45;
+	        } else { //Backwards
+	        	gyroPID.P = 1.325;
+	        	gyroPID.I = 9.49e-4;
+	        	gyroPID.D = 305;
+	        }
+        	
+        	gyroPID.input(nav.getAngle());
+            turn = -gyroPID.getCorrection() * OVERALL_PID_GAIN;
+            
+            System.out.println("stability: " + (Math.abs(turn) < 0.05));
+            System.out.println("isStable:" + gyroPID.isStable(2));
+        }
+	    leftWheel1.set(ControlMode.PercentOutput, -speed);
+	    leftWheel2.set(ControlMode.PercentOutput, -speed);
+	    rightWheel1.set(ControlMode.PercentOutput, speed);
+	    rightWheel2.set(ControlMode.PercentOutput, speed);
+	    omniWheels.set(ControlMode.PercentOutput, -turn);
+	    
+	    /*if (manipStick.getRawButton(3)) {
+	    	wrist.set(ControlMode.PercentOutput, .75); //X, up
+	    } else if (manipStick.getRawButton(4)) {
+	    	wrist.set(ControlMode.PercentOutput, -.22); //Y, down
+	    } else {
+	    	wrist.set(ControlMode.PercentOutput, 0);
+	    }*/
         
         if (manipStick.getRawButton(5)) { //retract manip screw "LB"
-        	
+        	leadScrew.set(ControlMode.PercentOutput, -.75);
         } else if (manipStick.getRawButton(6)) { //extend manip screw "RB"
-        	
+        	leadScrew.set(ControlMode.PercentOutput, .75);
         } else {
-        	
+        	leadScrew.set(ControlMode.PercentOutput, 0);
         }
         
-        if (manipStick.getRawButton(1)) { //grab "A"
-        	
-        } else if (manipStick.getRawButton(2)) { //release "B"
-        	
-    	}
+        /*if (manipStick.getRawButtonPressed(1)) { //grab "A"
+        	hand.set(DoubleSolenoid.Value.kForward);
+        } else if (manipStick.getRawButtonPressed(2)) { //release "B"
+        	hand.set(DoubleSolenoid.Value.kReverse);
+    	}*/
         
-        if (manipStick.getRawAxis(3) >= .5) { //Up "RT"
-        	arm.set(ControlMode.PercentOutput, -.5);
-        } else if (manipStick.getRawAxis(2) >= .5) { //Down "LT"
-        	arm.set(ControlMode.PercentOutput, .5);
-        } else {
+        if (rightStick.getRawButtonPressed(5)) {
+        	Timer.startNewThread(() -> {
+        		maxArm();
+        	});
+        }
+        if (rightStick.getRawButton(6)) {
         	arm.set(ControlMode.PercentOutput, 0);
         }
-//        
-//        SmartDashboard.putNumber("X Value", accel.getX());
-//        SmartDashboard.putNumber("Y Value", accel.getY());
-//        SmartDashboard.putNumber("Z Value", accel.getZ());
+//        if (rightStick.getRawButton(3)) {
+//        	wrist.set(ControlMode.PercentOutput, 1);
+//        } else if (rightStick.getRawButton(4)) {
+//        	wrist.set(ControlMode.PercentOutput, -1);
+//        } else {
+//        	wrist.set(ControlMode.PercentOutput, 0);
+//        }
         
-        //System.out.println(stringPot.getValue());
-        SmartDashboard.putNumber("Pos", leftWheel.getSensorCollection().getQuadraturePosition());
-        SmartDashboard.putNumber("Pos1", leftWheel.getSensorCollection().getQuadraturePosition());
+        if (rightStick.getRawButtonPressed(1)) {
+        	Timer.startNewThread(() -> {
+        		midScale();
+        	});
+        }
+
+//	    SmartDashboard.putNumber("power", power);
+	    SmartDashboard.putNumber("stringPot", stringPot.getValue());
+	    
+//	    if (manipStick.getRawButtonPressed(3)) {
+//        	hand.set(DoubleSolenoid.Value.kForward);
+//	    } else if (manipStick.getRawButtonPressed(4)) {
+//        	hand.set(DoubleSolenoid.Value.kReverse);
+//	    }
+	    
+//        if (manipStick.getRawAxis(3) >= .5) { //Up "RT"
+//        	arm.set(ControlMode.PercentOutput, -1);
+//        } else if (manipStick.getRawAxis(2) >= .5) { //Down "LT"
+//        	arm.set(ControlMode.PercentOutput, .1);
+//        } else {
+//        	arm.set(ControlMode.PercentOutput, 0);
+//        }
         
+//        if (rightStick.getRawButton(12)) {
+//        	leftWheel.set(ControlMode.PercentOutput, -0.5 * 0.5);
+//        	rightWheel.set(ControlMode.PercentOutput, 1 * 0.5);
+//        	omniWheels.set(ControlMode.PercentOutput, 0.97 * 0.5);
+//        	if (spiGyro.getRate() != 0) // << crappy high-pass filter
+//        		SmartDashboard.putNumber("gyro rate", spiGyro.getRate());
+//        }
+    }
+    
+    public void throwCube(double power, long millis) {
+    	wrist.set(ControlMode.PercentOutput, power);
+    	try {
+    		Thread.sleep(millis);
+    	} catch(InterruptedException e) {
+    		return;
+    	}
+    	hand.set(DoubleSolenoid.Value.kReverse);
+    	wrist.set(ControlMode.PercentOutput, 0);
+    }
+    
+    public void switchThrow() {
+    	throwCube(-0.22, 500);
+    }
+    
+    public void maxArm() {
+    	double start = System.currentTimeMillis();
+    	while (System.currentTimeMillis() - start < 2000) {
+    		double power = MecanumDrive.map(stringPot.getValue(), 400, 2600, 1, 0.1);
+    		arm.set(ControlMode.PercentOutput, -power);
+    		try {
+    			Thread.sleep(10);
+    		} catch (InterruptedException e) {
+    			return;
+    		}
+    	}
+    }
+    
+    public void midScaleThrow() {
+    	throwCube(-0.75, 500);
+    }
+    public void midScale() {
+    	maxArm();
+	    midScaleThrow();
     }
     
     public double deadZone(double i) {

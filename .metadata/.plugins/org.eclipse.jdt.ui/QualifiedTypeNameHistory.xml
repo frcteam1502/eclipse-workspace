@@ -3,7 +3,6 @@
 <fullyQualifiedTypeName name="java.math.BigInteger"/>
 <fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.Type"/>
 <fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.NeutralMode"/>
-<fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.TimerType"/>
 <fullyQualifiedTypeName name="edu.wpi.first.wpilibj.GenericHID.RumbleType"/>
 <fullyQualifiedTypeName name="edu.wpi.first.wpilibj.interfaces.Accelerometer"/>
 <fullyQualifiedTypeName name="edu.wpi.first.wpilibj.BuiltInAccelerometer"/>
@@ -11,7 +10,10 @@
 <fullyQualifiedTypeName name="edu.wpi.first.wpilibj.Joystick"/>
 <fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.can.TalonSRX"/>
 <fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.can.VictorSPX"/>
-<fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.ControlMode"/>
 <fullyQualifiedTypeName name="java.lang.System"/>
 <fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.AutoBot.Unit"/>
+<fullyQualifiedTypeName name="edu.wpi.first.wpilibj.AnalogInput"/>
+<fullyQualifiedTypeName name="edu.wpi.first.wpilibj.DoubleSolenoid.Value"/>
+<fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.TimerType"/>
+<fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.ControlMode"/>
 </qualifiedTypeNameHistroy>

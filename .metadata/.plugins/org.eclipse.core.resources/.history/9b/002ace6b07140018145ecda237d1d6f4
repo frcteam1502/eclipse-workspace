@@ -1,0 +1,141 @@
+package org.usfirst.frc.team1502.robot;
+
+import java.util.Date;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.NeutralMode;
+
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+
+interface Lambda {
+	int call();
+}
+
+public class AutoBot {
+	TestRun driveSys;
+	
+	public enum Unit {
+		kFeet,
+		kDegrees,
+		kPulses
+	};
+	
+	public static final double GEAR_RATIO = 2.461538; //32 / 13
+	public static final double PULSES_PER_REV = 1440 * GEAR_RATIO;
+	public static final double PULSES_PER_FOOT = PULSES_PER_REV * 0.51894; //Encoder PPR / Wheel Circumference (Feet) = 1839
+	public static final double PULSES_PER_DEGREE = PULSES_PER_REV / 360; //Encoder PPR / Degrees in a Circle
+	
+	public AutoBot(TestRun driveSys) {
+		this.driveSys = driveSys;
+	}
+	
+	public static double convertToTicks(double value, Unit unit) {
+		switch (unit) {
+			case kFeet:
+				return value * PULSES_PER_FOOT;
+			case kDegrees:
+				return value * PULSES_PER_DEGREE;
+			case kPulses:
+				return value;
+			default:
+				throw new ArithmeticException("Can't convert units");
+		}
+	}
+	
+	/**
+	 * This function's return value only makes sense when used in a ratio with another result of this function on the bottom. Otherwise do not use. Good for calculating drive wheel to omni wheel speed ratio.
+	 */
+	public static double calculateUnionTurnSpeed (double degrees, double radius, double circumference, double angle) {
+		return ((2 * 3.14 * radius) * degrees) / (360 * circumference * Math.sin(Math.toRadians(angle)));
+	}
+
+	
+	public void leftPivotTurn(double degrees) throws InterruptedException {
+		double pulses = degrees * driveSys.PULSES_PER_90DEG_YAW/ 90;
+		int startPos = driveSys.rightWheel.getSensorCollection().getQuadraturePosition();
+		//driveSys.spiGyro.reset();
+		Thread.sleep(250);
+		SmartDashboard.putNumber("Before", startPos);
+		driveSys.leftWheel.set(ControlMode.PercentOutput, 0.07);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, .5);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, 0.15);
+//		while (Math.abs(driveSys.rightWheel.getSensorCollection().getQuadraturePosition() - startPos) < driveSys.PULSES_PER_90DEG_YAW ) {
+//			Thread.yield();
+//		}
+//		while (Math.abs(driveSys.spiGyro.getAngle()) < degrees - 21.5) {
+//			Thread.yield();
+//		} 
+		//SmartDashboard.putNumber("After" , driveSys.rightWheel.getSensorCollection().getQuadraturePosition());
+		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
+		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
+		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
+		Thread.sleep(1000);		
+		//SmartDashboard.putNumber("After", driveSys.spiGyro.getAngle());
+	}
+	
+	public void turn(double degrees) {
+		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
+		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
+		
+		double speed;
+		double dir;
+
+		if (degrees > 0) {
+			speed = 1;
+			dir = 1;
+		} else if (degrees < 0) {
+			speed = 1;
+			dir = -1;
+		} else {
+			return;
+		}
+		driveSys.nav.reset();
+		Lambda getPos = () -> (int) (driveSys.nav.getAngle());
+		int initialPosition = getPos.call();
+		int destination = initialPosition + (int) degrees;
+		Lambda getDistLeft = () -> (destination - getPos.call());
+		
+		driveSys.leftWheel.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, speed);
+		
+		while (dir * getDistLeft.call() > 0) {
+			System.out.println("Normal: " + driveSys.nav.getAngle());
+			if (driveSys.isTeleop) break;
+			
+			SmartDashboard.putNumber("dist left", getDistLeft.call());
+			SmartDashboard.putNumber("current position", getPos.call());
+			
+			Thread.yield();
+		}
+		
+		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
+		
+		PIDController gyroLock = new PIDController(1.325, 9.49e-4, 320);
+		
+		while (driveSys.nav.getAngle() - degrees > 0 || Math.abs(driveSys.nav.getRate()) < 0.1) {
+			System.out.println("PID: " + driveSys.nav.getAngle());
+			if (driveSys.isTeleop) break;
+			gyroLock.input(driveSys.nav.getAngle() - degrees);
+			if ((gyroLock.latest().err > 0 && gyroLock.prev().err < 0) || (gyroLock.latest().err < 0 && gyroLock.prev().err > 0)) {
+				gyroLock.reset();
+				driveSys.nav.reset();
+			}
+			driveSys.omniWheels.set(ControlMode.PercentOutput, gyroLock.getCorrection() * TestRun.OVERALL_PID_GAIN);
+			Thread.yield();
+		}
+		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
+		
+		try {
+			Thread.sleep(300);
+		} catch (InterruptedException e) {
+			return;
+		}
+		driveSys.leftWheel.setNeutralMode(NeutralMode.Coast);
+		driveSys.rightWheel.setNeutralMode(NeutralMode.Coast);
+	}
+}

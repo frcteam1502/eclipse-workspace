@@ -49,9 +49,9 @@ public class AutoBot {
 		return ((2 * 3.14 * radius) * degrees) / (360 * circumference * Math.sin(Math.toRadians(angle)));
 	}
 	
-	public void go(double distance, Unit unit) {
-		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
-		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
+	public void go(double distance, Unit unit, boolean slowDown) {
+		driveSys.leftWheel1.setNeutralMode(NeutralMode.Brake);
+		driveSys.rightWheel1.setNeutralMode(NeutralMode.Brake);
 		
 		PIDController gyroLock;
 		distance = (int) convertToTicks(distance, unit);
@@ -72,15 +72,15 @@ public class AutoBot {
 			return;
 		}
 		
-		driveSys.leftWheel.set(ControlMode.PercentOutput, -speed);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, speed);
-		Lambda getPos = () -> (driveSys.rightWheel.getSensorCollection().getQuadraturePosition());
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, -speed);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, speed);
+		Lambda getPos = () -> (driveSys.leftWheel1.getSensorCollection().getQuadraturePosition());
 		int initialPosition = getPos.call();
 		int destination = initialPosition + (int) distance;
-		int slowdownPoint = (int) convertToTicks(1, Unit.kFeet);
+		int slowdownPoint = (int) convertToTicks(5, Unit.kFeet);
 		Lambda getDistLeft = () -> (destination - getPos.call());
 		
-		while (dir * getDistLeft.call() > 0/* || !gyroLock.isStable(2) || driveSys.leftWheel.getSensorCollection().getQuadratureVelocity() * 10 / PULSES_PER_DEGREE < 10*/) {
+		while (dir * getDistLeft.call() > 0 || !gyroLock.isStable(2) /*|| driveSys.leftWheel.getSensorCollection().getQuadratureVelocity() * 10 / PULSES_PER_DEGREE < 10*/) {
 			if (driveSys.isTeleop) break;
 			gyroLock.input(driveSys.nav.getAngle());
 			if ((gyroLock.latest().err > 0 && gyroLock.prev().err < 0) || (gyroLock.latest().err < 0 && gyroLock.prev().err > 0)) {
@@ -89,108 +89,108 @@ public class AutoBot {
 			}
 			driveSys.omniWheels.set(ControlMode.PercentOutput, gyroLock.getCorrection() * TestRun.OVERALL_PID_GAIN);
 			SmartDashboard.putNumber("dist left", getDistLeft.call());
-			//SmartDashboard.putNumber("degs per second", driveSys.leftWheel.getSensorCollection().getQuadratureVelocity() * 10 / PULSES_PER_DEGREE);
+			SmartDashboard.putNumber("degs per second", driveSys.leftWheel1.getSensorCollection().getQuadratureVelocity() * 10 / PULSES_PER_DEGREE);
 			SmartDashboard.putNumber("current position", getPos.call());
-			if (Math.abs(getDistLeft.call()) < slowdownPoint) {
+			if (Math.abs(getDistLeft.call()) < slowdownPoint && slowDown) {
 				double power = (double) getDistLeft.call() / (double) slowdownPoint * Math.abs(speed);
-				driveSys.leftWheel.set(ControlMode.PercentOutput, -power);
-				driveSys.rightWheel.set(ControlMode.PercentOutput, power);
+				driveSys.leftWheel1.set(ControlMode.PercentOutput, -power);
+				driveSys.rightWheel1.set(ControlMode.PercentOutput, power);
 				SmartDashboard.putNumber("power", power);
 				SmartDashboard.putNumber("power outputting", Math.random());
 			}
 			
 			Thread.yield();
 		}
-		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, 0);
 		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
 		try {
 			Thread.sleep(300);
 		} catch (InterruptedException e) {
 			return;
 		}
-		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
-		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
+		driveSys.leftWheel1.setNeutralMode(NeutralMode.Coast);
+		driveSys.rightWheel1.setNeutralMode(NeutralMode.Coast);
 	}
 	
 	public void leftPivotTurn(double degrees) throws InterruptedException {
 		double pulses = degrees * driveSys.PULSES_PER_90DEG_YAW/ 90;
-		int startPos = driveSys.rightWheel.getSensorCollection().getQuadraturePosition();
-		//driveSys.spiGyro.reset();
+		int startPos = driveSys.rightWheel1.getSensorCollection().getQuadraturePosition();
+		driveSys.nav.reset();
 		Thread.sleep(250);
 		SmartDashboard.putNumber("Before", startPos);
-		driveSys.leftWheel.set(ControlMode.PercentOutput, 0.07);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, .5);
-		driveSys.omniWheels.set(ControlMode.PercentOutput, 0.15);
-//		while (Math.abs(driveSys.rightWheel.getSensorCollection().getQuadraturePosition() - startPos) < driveSys.PULSES_PER_90DEG_YAW ) {
-//			Thread.yield();
-//		}
-//		while (Math.abs(driveSys.spiGyro.getAngle()) < degrees - 21.5) {
-//			Thread.yield();
-//		} 
-		//SmartDashboard.putNumber("After" , driveSys.rightWheel.getSensorCollection().getQuadraturePosition());
-		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
-		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
-		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, 1);
+		driveSys.omniWheels.set(ControlMode.PercentOutput, .97);
+		while (Math.abs(driveSys.rightWheel1.getSensorCollection().getQuadraturePosition() - startPos) < driveSys.PULSES_PER_90DEG_YAW ) {
+			Thread.yield();
+		}
+		while (Math.abs(driveSys.nav.getAngle()) < degrees - 21.5) {
+			Thread.yield();
+		} 
+		SmartDashboard.putNumber("After" , driveSys.rightWheel1.getSensorCollection().getQuadraturePosition());
+		driveSys.leftWheel1.setNeutralMode(NeutralMode.Brake);
+		driveSys.rightWheel1.setNeutralMode(NeutralMode.Brake);
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, 0);
 		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
 		Thread.sleep(1000);		
 		//SmartDashboard.putNumber("After", driveSys.spiGyro.getAngle());
 	}
 	
 	public void turn(double degrees) {
-		driveSys.leftWheel.setNeutralMode(NeutralMode.Brake);
-		driveSys.rightWheel.setNeutralMode(NeutralMode.Brake);
+		driveSys.leftWheel1.setNeutralMode(NeutralMode.Brake);
+		driveSys.rightWheel1.setNeutralMode(NeutralMode.Brake);
 		
 		double speed;
 		double dir;
 
 		if (degrees > 0) {
-			speed = -.4;
+			speed = 1;
 			dir = 1;
 		} else if (degrees < 0) {
-			speed = .4;
+			speed = 1;
 			dir = -1;
 		} else {
 			return;
 		}
-		//driveSys.spiGyro.reset();
-		//Lambda getPos = () -> (int) (driveSys.spiGyro.getAngle());
-		//int initialPosition = getPos.call();
-		//int destination = initialPosition + (int) degrees;
-		//Lambda getDistLeft = () -> (destination - getPos.call());
+		driveSys.nav.reset();
+		Lambda getPos = () -> (int) (driveSys.nav.getAngle());
+		int initialPosition = getPos.call();
+		int destination = initialPosition + (int) degrees;
+		Lambda getDistLeft = () -> (destination - getPos.call());
 		
-		driveSys.leftWheel.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, speed * driveSys.DRIVE_OMNI_RATIO);
 		driveSys.omniWheels.set(ControlMode.PercentOutput, speed);
 		
-//		while (dir * getDistLeft.call() > 0) {
-//			System.out.println("Normal: " + driveSys.spiGyro.getAngle());
-//			if (driveSys.isTeleop) break;
-//			
-//			SmartDashboard.putNumber("dist left", getDistLeft.call());
-//			SmartDashboard.putNumber("current position", getPos.call());
-//			
-//			Thread.yield();
-//		}
+		while (dir * getDistLeft.call() > 0) {
+			System.out.println("Normal: " + driveSys.nav.getAngle());
+			if (driveSys.isTeleop) break;
+			
+			SmartDashboard.putNumber("dist left", getDistLeft.call());
+			SmartDashboard.putNumber("current position", getPos.call());
+			
+			Thread.yield();
+		}
 		
-		driveSys.leftWheel.set(ControlMode.PercentOutput, 0);
-		driveSys.rightWheel.set(ControlMode.PercentOutput, 0);
+		driveSys.leftWheel1.set(ControlMode.PercentOutput, 0);
+		driveSys.rightWheel1.set(ControlMode.PercentOutput, 0);
 		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
 		
 		PIDController gyroLock = new PIDController(1.325, 9.49e-4, 320);
 		
-//		while (driveSys.spiGyro.getAngle() - degrees > 0 || Math.abs(driveSys.spiGyro.getRate()) < 0.1) {
-//			System.out.println("PID: " + driveSys.spiGyro.getAngle());
-//			if (driveSys.isTeleop) break;
-//			gyroLock.input(driveSys.spiGyro.getAngle() - degrees);
-//			if ((gyroLock.latest().err > 0 && gyroLock.prev().err < 0) || (gyroLock.latest().err < 0 && gyroLock.prev().err > 0)) {
-//				gyroLock.reset();
-//				driveSys.spiGyro.reset();
-//			}
-//			driveSys.omniWheels.set(ControlMode.PercentOutput, gyroLock.getCorrection() * TestRun.OVERALL_PID_GAIN);
-//			Thread.yield();
-//		}
+		while (driveSys.nav.getAngle() - degrees > 0 || Math.abs(driveSys.nav.getRate()) < 0.1) {
+			System.out.println("PID: " + driveSys.nav.getAngle());
+			if (driveSys.isTeleop) break;
+			gyroLock.input(driveSys.nav.getAngle() - degrees);
+			if ((gyroLock.latest().err > 0 && gyroLock.prev().err < 0) || (gyroLock.latest().err < 0 && gyroLock.prev().err > 0)) {
+				gyroLock.reset();
+				driveSys.nav.reset();
+			}
+			driveSys.omniWheels.set(ControlMode.PercentOutput, gyroLock.getCorrection() * TestRun.OVERALL_PID_GAIN);
+			Thread.yield();
+		}
 		driveSys.omniWheels.set(ControlMode.PercentOutput, 0);
 		
 		try {
@@ -198,7 +198,7 @@ public class AutoBot {
 		} catch (InterruptedException e) {
 			return;
 		}
-		driveSys.leftWheel.setNeutralMode(NeutralMode.Coast);
-		driveSys.rightWheel.setNeutralMode(NeutralMode.Coast);
+		driveSys.leftWheel1.setNeutralMode(NeutralMode.Coast);
+		driveSys.rightWheel1.setNeutralMode(NeutralMode.Coast);
 	}
 }
