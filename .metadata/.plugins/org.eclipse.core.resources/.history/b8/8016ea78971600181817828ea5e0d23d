@@ -1,0 +1,13 @@
+package org.usfirst.frc.team1502.robot;
+
+public class CardinalSins {
+	void overengineering() {
+		
+	}
+	void gluttony() {
+		
+	}
+	void sloth() {
+		
+	}
+}

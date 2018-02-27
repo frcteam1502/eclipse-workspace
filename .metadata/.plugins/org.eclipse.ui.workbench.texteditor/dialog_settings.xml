@@ -2,22 +2,24 @@
 <section name="Workbench">
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog">
 		<item value="false" key="isRegEx"/>
-		<item value="getRawButton(4)" key="selection"/>
+		<item value="" key="selection"/>
 		<item value="false" key="casesensitive"/>
 		<item value="false" key="incremental"/>
 		<item value="true" key="wrap"/>
-		<item value="false" key="wholeword"/>
+		<item value="true" key="wholeword"/>
 		<list key="findhistory">
+			<item value="DoubleSole"/>
+			<item value="rightWheel1"/>
+			<item value="leftWheel1"/>
 			<item value="getRawButton(4)"/>
 			<item value="system.out"/>
 			<item value="sy"/>
 			<item value="usb"/>
 			<item value="camusb"/>
-			<item value="cam"/>
-			<item value="wris"/>
-			<item value="wr"/>
 		</list>
 		<list key="replacehistory">
+			<item value="rightWheel"/>
+			<item value="leftWheel"/>
 		</list>
 	</section>
 	<section name="org.eclipse.ui.texteditor.FindReplaceDialog_dialogBounds">

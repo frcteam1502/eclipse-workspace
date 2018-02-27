@@ -1,0 +1,25 @@
+package org.usfirst.frc.team1502.robot;
+
+public class CardinalSins {
+	void overengineering() {
+		// self-explanatory
+	}
+	void gluttony() {
+		// failure to refactor crappy code
+	}
+	void sloth() {
+		// validate inputs
+	}
+	void wrath() {
+		// comment your code if it isn't very well written or self-documenting
+	}
+	void envy() {
+		// use GitHub or die
+	}
+	void pride() {
+		// not testing enough
+	}
+	void under_scores() {
+		// Java ALWAYS uses camel case.
+	}
+}

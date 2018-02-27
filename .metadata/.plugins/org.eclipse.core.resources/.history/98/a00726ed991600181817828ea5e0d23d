@@ -1,0 +1,25 @@
+package org.usfirst.frc.team1502.robot;
+
+public class CardinalSins {
+	void overengineering() {
+		// Your code only has to do what it is designed to do. Robbie tends to commit this sin on a regular basis.
+	}
+	void gluttony() {
+		// Failure to refactor crappy code. Last-minute fixes are not permanent solutions.
+	}
+	void sloth() {
+		// Not validating your inputs 
+	}
+	void laziness() {
+		// use GitHub or die
+	}
+	void pride() {
+		// not testing enough
+	}
+	void under_scores() {
+		// Java ALWAYS uses camel case.
+	}
+	void magicNumbers() {
+		// 0.4202?? What's that?? Hmm, if only I could name this number to improve readability.
+	}
+}

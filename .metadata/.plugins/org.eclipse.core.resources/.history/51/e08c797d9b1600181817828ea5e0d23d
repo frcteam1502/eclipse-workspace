@@ -1,0 +1,40 @@
+package org.usfirst.frc.team1502.robot;
+
+public class CardinalSins {
+	void overengineering() {
+		// Your code only has to do what it is designed to do. Robbie tends to commit this sin on a regular basis.
+	}
+	void gluttony() {
+		// Failure to refactor crappy code. Last-minute fixes are not permanent solutions.
+		
+		// Example: All of 2017 robot code. See GitHub
+	}
+	int sloth(int input) {
+		// Not validating your inputs 
+		
+		int output = 2 / input;
+		return output; // << WRONG!!!
+	}
+	void indolence() {
+		// use GitHub or die
+	}
+	void pride() {
+		// You just wrote a lot of code. Great. It probably won't work. Don't write too much without testing.
+		
+		// Example: just about everything we write when we can't use the robot
+	}
+	void under_scores() {
+		// Java ALWAYS uses camel case.
+		
+		// Example: nothing. Yet. Don't let it happen.
+	}
+	void magicNumbers() {
+		// 0.4202?? What's that?? Hmm, if only I could name this number to improve readability.
+	}
+	void copyingAndPasting() {
+		// Why implement it myself when I can Google this quick and easy fix? *one massive code-paste later* wtf does this do??
+	}
+	void doingThis(){
+		// if you write methods or if statements like this, you might wake up dead next morning.
+	}
+}

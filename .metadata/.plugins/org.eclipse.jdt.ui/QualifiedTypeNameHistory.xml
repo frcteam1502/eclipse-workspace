@@ -16,4 +16,7 @@
 <fullyQualifiedTypeName name="edu.wpi.first.wpilibj.DoubleSolenoid.Value"/>
 <fullyQualifiedTypeName name="org.usfirst.frc.team1502.robot.Timer.TimerType"/>
 <fullyQualifiedTypeName name="com.ctre.phoenix.motorcontrol.ControlMode"/>
+<fullyQualifiedTypeName name="java.util.Arrays"/>
+<fullyQualifiedTypeName name="java.util.stream.DoubleStream"/>
+<fullyQualifiedTypeName name="java.util.List"/>
 </qualifiedTypeNameHistroy>

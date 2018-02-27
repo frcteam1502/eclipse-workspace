@@ -1,0 +1,386 @@
+package org.usfirst.frc.team1502.robot;
+
+import edu.wpi.first.wpilibj.Spark;
+import edu.wpi.first.wpilibj.interfaces.Accelerometer;
+import edu.wpi.first.wpilibj.GenericHID.RumbleType;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj.ADXRS450_Gyro;
+import edu.wpi.first.wpilibj.AnalogInput;
+import edu.wpi.first.wpilibj.BuiltInAccelerometer;
+import edu.wpi.first.wpilibj.Compressor;
+import edu.wpi.first.wpilibj.DoubleSolenoid;
+import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.Joystick;
+import edu.wpi.first.wpilibj.Relay;
+import edu.wpi.first.wpilibj.DigitalInput;
+import com.kauailabs.navx.frc.AHRS;
+import edu.wpi.first.wpilibj.SerialPort;
+import edu.wpi.first.wpilibj.I2C;
+import edu.wpi.first.wpilibj.SPI;
+
+import org.usfirst.frc.team1502.robot.AutoBot.Unit;
+
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.VelocityMeasPeriod;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
+import com.ctre.phoenix.motorcontrol.can.VictorSPX;
+
+//import org.usfirst.frc.team1502.robot.AutoBot.Unit;
+
+public class TestRun {
+	public TalonSRX leftWheel;
+	public TalonSRX rightWheel;
+    public VictorSPX omniWheels;
+    public TalonSRX arm;
+    public TalonSRX leadScrew;
+    public TalonSRX wrist;
+    public DoubleSolenoid hand;
+    public DoubleSolenoid climber;
+    public Joystick leftStick;
+    public Joystick rightStick;
+    public Joystick manipStick;
+    public DigitalInput limitSwitch;
+    public boolean gyroOnLastCycle = false;
+    public int tickCount = 0; // 50 ticks per second
+    public ADXRS450_Gyro spiGyro;
+    public Accelerometer accel;
+    public AnalogInput armHeight;
+    public AnalogInput wristExtension;
+    public AHRS nav;
+    
+    public PIDController gyroPID;
+    public boolean isKeplerStopped = false;
+    public boolean isTeleop = false;
+    
+    static final double DEADZONE = 0.02;
+    public static final double OVERALL_PID_GAIN = 0.04;
+    public static final double WHEEL_TICKS_PER_DEGREE = 2588 / 360;
+    
+    public static final double DRIVE_DIST_TO_AXIS = 10; //Distance to Axis of Rotation, Inches
+    public static final double OMNI_DIST_TO_AXIS = 23; //Distance to Axis of Rotation, Inches
+    public static final double DRIVE_ANGLE_FORCE = 90; //Angle between Wheel and "Line" to AoR
+    public static final double OMNI_ANGLE_FORCE = 115; //Angle between Wheel and "Line" to AoR
+    public static final double DRIVE_CIRCUMFERENCE = 23.56; //Wheel Circumference, Inches
+    public static final double OMNI_CIRCUMFERENCE = 25.13; //Wheel Circumference, Inches
+    public static final double DRIVE_OMNI_RATIO = 0.4202;
+    public static final double PULSES_PER_90DEG_YAW = 4876;
+    public static final double GENTLE_WRIST_DOWN = -0.22;
+    public static final double GENTLE_WRIST_UP = 0.75;
+    
+    static double EXP_RATE = 3;
+    
+    boolean gyroWasOnLastCycle = false;
+    boolean gyroIsOn = false;
+    
+    public Rumbler r;
+    
+    public TestRun(Joystick left, Joystick right, Joystick manip, int w1, int w2, int w3, ADXRS450_Gyro spiGyro) {
+        
+    	Accelerometer accel;
+    	this.accel = new BuiltInAccelerometer(); 
+    	accel = new BuiltInAccelerometer(Accelerometer.Range.k8G);
+    	
+    	this.leftStick = left;
+        this.rightStick = right;
+        this.manipStick = manip;
+        
+        this.leftWheel = new TalonSRX(1);
+        this.rightWheel = new TalonSRX(3);
+        this.omniWheels = new VictorSPX(5);
+        this.arm = new TalonSRX(6);
+        this.leadScrew = new TalonSRX(7);
+        this.wrist = new TalonSRX(8);
+        
+        this.hand = new DoubleSolenoid(11, 2, 3);
+        this.climber = new DoubleSolenoid(11, 0, 1);
+        
+        this.gyroPID = new PIDController(1.325, 9.49e-4, 320);
+        this.spiGyro = spiGyro;
+        
+        this.armHeight = new AnalogInput(3);
+        this.wristExtension = new AnalogInput(2);
+        
+        nav = new AHRS(SPI.Port.kMXP);
+    }
+    
+    public void testPeriodic() {
+    	
+    }
+    
+    public void autonomousPeriodic() {
+    	
+    }
+    
+    public void autonomousInit() {
+    	/*String gameData;
+    	gameData = DriverStation.getInstance().getGameSpecificMessage();
+    	
+    	if (gameData.valueOf(0) == "L") {
+    		//Left
+    	} else {
+    		//Right
+    	}*/
+//    	isTeleop = false;
+//    	leftWheel.configOpenloopRamp(.15, 10);
+//    	rightWheel.configOpenloopRamp(.15, 10);
+//    	omniWheels.configOpenloopRamp(.15, 10);
+//    	arm.configOpenloopRamp(.14, 10);
+//    	AutoBot bot = new AutoBot(this);
+//    	Timer.startNewThread(() -> {
+//    		bot.go(10, Unit.kFeet, false);	
+//    		leftWheel.set(ControlMode.PercentOutput, -.4);
+//    		rightWheel.set(ControlMode.PercentOutput, .4);
+//    		try {
+//    			Thread.sleep(2000);
+//    		} catch (InterruptedException e) {
+//    			
+//    		}
+//    		try {
+//    			bot.leftPivotTurn(90);
+//    		} catch (InterruptedException e) {
+//    		
+//    		}
+    //	});
+    }
+    
+    public void teleopInit() {
+    	isTeleop = true;
+    	//leftWheel.configOpenloopRamp(.15, 10);
+    	//rightWheel.configOpenloopRamp(.15, 10);
+    	//omniWheels.configOpenloopRamp(.1, 10);
+    	r = new Rumbler(manipStick);
+    	r.rumbleBothFor(1, 300);
+    	
+    	nav.reset();
+
+		//leftWheel.configVelocityMeasurementPeriod(VelocityMeasPeriod.Period_1Ms, 100);
+    }
+    
+    public void teleopPeriodic() {
+        double speed = MecanumDrive.expRate(deadZone(rightStick.getY()), EXP_RATE);
+        double turn = MecanumDrive.expRate(deadZone(leftStick.getX()), EXP_RATE);
+        
+        if (leftStick.getRawButton(8)) {
+        	//spiGyro.calibrate();
+        }
+       
+//        if (leftStick.getRawButton(11)) {
+//        	double pwr = rightStick.getThrottle();
+//        	pwr = (1 - pwr) / 2;
+//        	System.out.println(pwr);
+//           	leftWheel.set(ControlMode.PercentOutput, pwr * .4202);
+//           	rightWheel.set(ControlMode.PercentOutput, pwr * .4202);
+//           	omniWheels.set(ControlMode.PercentOutput, pwr * 1);
+//           	return;
+//        } if (rightStick.getRawButton(11)) {
+//        	double pwr = rightStick.getThrottle();
+//        	pwr = (1 - pwr) / 2;
+//        	System.out.println(pwr);
+//           	leftWheel.set(ControlMode.PercentOutput, pwr * -.4202);
+//           	rightWheel.set(ControlMode.PercentOutput, pwr * -.4202);
+//           	omniWheels.set(ControlMode.PercentOutput, pwr * -1);
+//           	return;
+//        }
+        
+//        System.out.println("Gyro angle: " + spiGyro.getAngle());
+//        if (leftStick.getRawButton(11)) {
+//        	double r = ((1 - leftStick.getThrottle()) / 2) * 8;
+//        	System.out.println("r: " + r);
+//        	leftWheel.configOpenloopRamp(r, 100);
+//        	rightWheel.configOpenloopRamp(r, 100);
+//        	omniWheels.configOpenloopRamp(r, 100);
+//        	return;
+//        }
+        	
+        gyroWasOnLastCycle = gyroIsOn;
+        gyroIsOn = rightStick.getRawButton(1);
+        
+        if (gyroIsOn && !gyroWasOnLastCycle) {
+        	gyroPID.reset();
+        	nav.reset();
+        }
+        
+        if (gyroIsOn) {
+        	if (speed <= 0) { //Forwards or Stationary
+	        	gyroPID.P = 0.575 * 1.1;
+	        	gyroPID.I = 2.83e-4 * 1.1;
+	        	gyroPID.D = 167.5 * .45;
+	        } else { //Backwards
+	        	gyroPID.P = 1.325;
+	        	gyroPID.I = 9.49e-4;
+	        	gyroPID.D = 305;
+	        }
+        	
+        	gyroPID.input(nav.getAngle());
+            turn = -gyroPID.getCorrection() * OVERALL_PID_GAIN;
+            
+            System.out.println("stability: " + (Math.abs(turn) < 0.05));
+            System.out.println("isStable:" + gyroPID.isStable(2));
+        }
+	    leftWheel.set(ControlMode.PercentOutput, speed);
+	    rightWheel.set(ControlMode.PercentOutput, -speed);
+	    omniWheels.set(ControlMode.PercentOutput, -turn);
+	    
+	    if (manipStick.getRawButton(9)) {
+		    if (manipStick.getRawButton(3)) {
+		    	wrist.set(ControlMode.PercentOutput, .75); //X, up
+		    } else if (manipStick.getRawButton(4)) {
+		    	wrist.set(ControlMode.PercentOutput, -.35); //Y, down
+		    } else {
+		    	wrist.set(ControlMode.PercentOutput, 0);
+		    }
+	    }
+	    
+        if (manipStick.getRawButton(5) && wristExtension.getValue() > 95) { //retract manip screw "LB"
+        	leadScrew.set(ControlMode.PercentOutput, -.75);
+        } else if (manipStick.getRawButton(6) && wristExtension.getValue() < 2500) { //extend manip screw "RB"
+        	leadScrew.set(ControlMode.PercentOutput, .75);
+        } else {
+        	leadScrew.set(ControlMode.PercentOutput, 0);
+        }
+        
+        if (manipStick.getRawButtonPressed(1)) { //grab "A"
+        	hand.set(DoubleSolenoid.Value.kForward);
+        } else if (manipStick.getRawButtonPressed(2)) { //release "B"
+        	hand.set(DoubleSolenoid.Value.kReverse);
+    	}
+        if (rightStick.getRawButtonPressed(4)) {
+        	Timer.startNewThread(() -> slowArmDown());
+        }
+        
+        if (rightStick.getRawButtonPressed(5)) {
+        	Timer.startNewThread(() -> maxArm());
+        }
+        if (rightStick.getRawButtonPressed(3)) {
+        	Timer.startNewThread(() -> grabCube());
+        }
+        if (rightStick.getRawButton(6)) {
+        	Timer.startNewThread(() -> slowArmDown());
+        }
+        
+        if (rightStick.getRawButtonPressed(1)) {
+        	Timer.startNewThread(() -> {
+        		midScale();
+        	});
+        }
+
+//	    SmartDashboard.putNumber("power", power);
+	    SmartDashboard.putNumber("stringPot", armHeight.getValue());
+	    SmartDashboard.putNumber("wristExtension", wristExtension.getValue());
+	    
+//	    if (manipStick.getRawButtonPressed(3)) {
+//        	hand.set(DoubleSolenoid.Value.kForward);
+//	    } else if (manipStick.getRawButtonPressed(4)) {
+//        	hand.set(DoubleSolenoid.Value.kReverse);
+//	    }
+	    
+//        if (manipStick.getRawAxis(3) >= .5) { //Up "RT"
+//        	arm.set(ControlMode.PercentOutput, -1);
+//        } else if (manipStick.getRawAxis(2) >= .5) { //Down "LT"
+//        	arm.set(ControlMode.PercentOutput, .1);
+//        } else {
+//        	arm.set(ControlMode.PercentOutput, 0);
+//        }
+        
+//        if (rightStick.getRawButton(12)) {
+//        	leftWheel.set(ControlMode.PercentOutput, -0.5 * 0.5);
+//        	rightWheel.set(ControlMode.PercentOutput, 1 * 0.5);
+//        	omniWheels.set(ControlMode.PercentOutput, 0.97 * 0.5);
+//        	if (spiGyro.getRate() != 0) // << crappy high-pass filter
+//        		SmartDashboard.putNumber("gyro rate", spiGyro.getRate());
+//        }
+    }
+    
+    public void slowArmDown() {
+    	System.out.println("slowArmDown started");
+    	arm.set(ControlMode.PercentOutput, 0.1);
+    	double start = System.currentTimeMillis();
+    	while (System.currentTimeMillis() - start < 3000) {
+    		try {
+    			Thread.sleep(10);
+    		} catch (InterruptedException e) {
+    			return;
+    		}
+    	}
+    	System.out.println("slowArmDown complete");
+    }
+    
+    public void throwCube(double power, long millis) {
+    	System.out.println("throwCube started");
+    	wrist.set(ControlMode.PercentOutput, power);
+    	try {
+    		Thread.sleep(millis);
+    	} catch(InterruptedException e) {
+    		return;
+    	}
+    	hand.set(DoubleSolenoid.Value.kReverse);
+    	wrist.set(ControlMode.PercentOutput, 0);
+    	System.out.println("throwCube complete");
+    }
+    
+    public void switchThrow() {
+    	throwCube(GENTLE_WRIST_DOWN, 500);
+    }
+    
+    public void maxArm() {
+    	System.out.println("maxArm started");
+    	double start = System.currentTimeMillis();
+    	while (System.currentTimeMillis() - start < 2000) {
+    		double power = MecanumDrive.map(armHeight.getValue(), 400, 2600, 1, 0.1);
+    		arm.set(ControlMode.PercentOutput, -power);
+    		try {
+    			Thread.sleep(10);
+    		} catch (InterruptedException e) {
+    			return;
+    		}
+    	}
+    	System.out.println("maxArm complete");
+    }
+    
+    public void grabCube() {
+    	try {
+    		hand.set(DoubleSolenoid.Value.kReverse);
+    		wrist.set(ControlMode.PercentOutput, GENTLE_WRIST_DOWN);
+    		Thread.sleep(750);
+    		hand.set(DoubleSolenoid.Value.kForward);
+    		Thread.sleep(250);
+    		wrist.set(ControlMode.PercentOutput, GENTLE_WRIST_UP);
+    	} catch (InterruptedException e) {
+    		return;
+    	}
+    }
+    
+    // vv HIGHLY NECESSARY LATER ON vv
+    
+    //public void raiseArmTo(double potentiometerValueDesired) {}
+    
+    public void maxWristExtension() {
+    	
+    }
+    
+    public void highScale() {
+    	maxArm();
+    	maxWristExtension();
+    	switchThrow();
+    }
+    
+    public void midScaleThrow() {
+    	throwCube(-1, 550);
+    }
+    
+    public void lowScale() {
+    	
+    }
+    
+    public void midScale() {
+    	maxArm();
+	    midScaleThrow();
+    }
+    
+    public double deadZone(double i) {
+        if (Math.abs(i) < DEADZONE) {
+            i = 0.0;
+        }
+        return i;
+    }
+}

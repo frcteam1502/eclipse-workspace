@@ -1,5 +1,9 @@
 package org.usfirst.frc.team1502.robot;
 
+import java.util.Arrays;
+import java.util.List;
+import java.util.stream.DoubleStream;
+
 import com.ctre.phoenix.motorcontrol.ControlMode;
 
 public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
@@ -100,6 +104,7 @@ public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
 		if (mag < 1) {
 			mag = 1;
 		}
+		
 		o /= mag;
 		l /= mag;
 		r /= mag;
@@ -108,17 +113,31 @@ public class MecanumDrive { // 0.03384 = P_TERM when using getRate()
 //		driveSys.rightWheel.set(ControlMode.PercentOutput, r);
 //		driveSys.omniWheels.set(ControlMode.PercentOutput, o);
 	}
-	public static double getGyroTurn(TestRun driveSys, double speed) {
-		//P_TERM = driveSys.rightStick.getThrottle() * 0.05;
-		// ^^ uncomment the above to tune P_TERM with right throttle
-//		double diff = driveSys.spiGyro.getAngle() * (0.5 + speed * 0.5);
-//		return -diff * P_TERM_VDRIVE;
-		// 4deg off course:
-		// 0.02 extra turn power
-		return .2;
+	
+	/**
+	 * Maps number ranges
+	 */
+	public static double map(double n, double startMin, double startMax, double endMin, double endMax) {
+		return (n - startMin) * (endMax - endMin) / (startMax - startMin) + endMin;
 	}
 	
-	public static double map(double n, double inMin, double inMax, double outMin, double outMax) {
-		return (n - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+	public static double vectorMag(double ...args) {
+		double accum = 0;
+		for (double x: args) {
+			accum += x * x;
+		}
+		double mag = Math.sqrt(accum);
+		if (mag < 1)
+			mag = 1;
+		return mag;
+	}
+	
+	public static double maxVectorComponentMag(double ...args) {
+		double largest = 1; // 1 is minimum
+		for (double x: args) {
+			if (Math.abs(x) > largest)
+				largest = Math.abs(x);
+		}
+		return largest;
 	}
 }

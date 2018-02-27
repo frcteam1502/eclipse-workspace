@@ -1,0 +1,56 @@
+package org.usfirst.frc.team1502.robot;
+
+public class CardinalSins {
+	void overengineering() {
+		// Your code only has to do what it is designed to do. Robbie tends to commit this sin on a regular basis.
+	}
+	void gluttony() {
+		// Failure to refactor crappy code. Last-minute fixes are not permanent solutions.
+		
+		// Example: All of 2017 robot code. See GitHub
+	}
+	int sloth(int input) {
+		// Not validating your inputs 
+		
+		int output = 2 / input;
+		return output; // << WRONG!!!
+	}
+	void indolence() {
+		// use GitHub or die
+	}
+	void pride() {
+		// You just wrote a lot of code. Great. It probably won't work. Don't write too much without testing.
+		
+		// Example: just about everything we write when we can't use the robot
+	}
+	void under_scores() {
+		// Java ALWAYS uses camel case.
+		
+		// Example: nothing. Yet. Don't let it happen.
+	}
+	void magicNumbers() {
+		// 0.4202?? What's that?? Hmm, if only I could name this number to improve readability.
+		
+		// Example:
+		double spiGyroAngle = 2938.3;
+		double tempSpeedChange = 0.05 + (spiGyroAngle * 0.01);
+		// ^^ Source: 2017 robot code
+	}
+	int variableNamesThatAreJustWaaaaaayWaaaayTooLoooong;
+	void methodNamesThatDontContainVerbs() {
+		// Variables are like nouns. Methods and functions are like verbs. If your programming looks like English, that's a good thing.
+	}
+	void doingThis(){
+		// if you write methods or if statements like this, you might wake up dead next morning.
+	}
+	void monolithicCoding() {
+		// Putting all your code in one file and not fragmenting properly.
+	}
+	void repeatingYourself() {
+		// Never copy and paste code to implement it elsewhere. Follow the DRY principle and make a function out of it.
+	}
+	String puttingTooManyDeadlySinsIntoThisFile = "oops, sorry";
+	void prematureOptimization() {
+		// It'll happen a couple milliseconds faster if I add 50 more lines of code into it! Or I could test it first and make sure it works.
+	}
+}
